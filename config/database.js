@@ -1,63 +1,92 @@
-// config/database.js - Configuración de base de datos (ES Modules)
-import sqlite3 from 'sqlite3';
+// config/database-postgres.js - Configuración para PostgreSQL
+import pg from 'pg';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-class Database {
+const { Pool } = pg;
+
+class PostgresDatabase {
   constructor() {
-    this.db = null;
+    this.pool = null;
   }
 
   connect() {
     return new Promise((resolve, reject) => {
-      const sqlite = sqlite3.verbose();
-      this.db = new sqlite.Database(
-        join(__dirname, '../database/ventanilla.db'),
-        (err) => {
-          if (err) {
-            console.error('Error conectando a la base de datos:', err);
-            reject(err);
-          } else {
-            console.log('✅ Conectado a SQLite');
-            resolve();
-          }
-        }
-      );
-    });
-  }
-
-  query(sql, params = []) {
-    return new Promise((resolve, reject) => {
-      if (sql.trim().toLowerCase().startsWith('select')) {
-        this.db.all(sql, params, (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-        });
-      } else {
-        this.db.run(sql, params, function(err) {
-          if (err) reject(err);
-          else resolve({ lastID: this.lastID, changes: this.changes });
-        });
+      // Configuración para Railway PostgreSQL
+      const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+      
+      if (!connectionString) {
+        reject(new Error('DATABASE_URL o POSTGRES_URL no está configurada'));
+        return;
       }
-    });
-  }
 
-  close() {
-    return new Promise((resolve) => {
-      if (this.db) {
-        this.db.close((err) => {
-          if (err) console.error('Error cerrando DB:', err);
-          else console.log('🔐 Base de datos cerrada');
+      this.pool = new Pool({
+        connectionString: connectionString,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+      });
+
+      this.pool.connect((err, client, release) => {
+        if (err) {
+          console.error('Error conectando a PostgreSQL:', err);
+          reject(err);
+        } else {
+          console.log('✅ Conectado a PostgreSQL');
+          release();
           resolve();
-        });
-      } else {
-        resolve();
-      }
+        }
+      });
     });
+  }
+
+  async query(sql, params = []) {
+    try {
+      // Convertir sintaxis SQLite (?) a PostgreSQL ($1, $2, etc.)
+      let pgSql = sql;
+      if (params.length > 0) {
+        let paramIndex = 1;
+        pgSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+      }
+      
+      console.log('🔍 Ejecutando query:', pgSql.substring(0, 100) + '...');
+      console.log('📊 Parámetros:', params);
+      
+      const result = await this.pool.query(pgSql, params);
+      
+      console.log('✅ Resultado:', result.rowCount, 'filas afectadas');
+      
+      // Para compatibilidad con SQLite, ajustamos la respuesta
+      if (pgSql.trim().toLowerCase().startsWith('select')) {
+        return result.rows;
+      } else {
+        // Para INSERT, intentar obtener el ID insertado
+        let lastID = null;
+        if (pgSql.trim().toLowerCase().startsWith('insert') && result.rows.length > 0) {
+          // Si la query retorna el ID (RETURNING clause)
+          lastID = result.rows[0].id || result.rows[0].idUsuario || result.rows[0].idFolio || result.rows[0].idRol;
+        }
+        
+        return {
+          lastID: lastID,
+          changes: result.rowCount || 0
+        };
+      }
+    } catch (error) {
+      console.error('❌ Error en query PostgreSQL:', error.message);
+      console.error('❌ SQL:', sql);
+      console.error('❌ Parámetros:', params);
+      throw error;
+    }
+  }
+
+  async close() {
+    if (this.pool) {
+      await this.pool.end();
+      console.log('🔐 Conexión PostgreSQL cerrada');
+    }
   }
 }
 
-export default new Database();
+export default new PostgresDatabase();

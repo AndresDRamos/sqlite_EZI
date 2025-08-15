@@ -1,12 +1,13 @@
-// server.js - Punto de entrada principal con arquitectura MVC (ES Modules)
+// server.js - Punto de entrada principal con PostgreSQL (ES Modules)
 import express from 'express';
 import cors from 'cors';
 import { config } from 'dotenv';
 
 // Importaciones
-import database from './config/database-auto.js';
+import database from './config/database.js';
 import apiRoutes from './src/routes/index.js';
 import errorHandler from './src/middleware/errorHandler.js';
+import createFreshPostgresTables from './database/migrate.js';
 
 config(); // Cargar variables de entorno
 
@@ -47,18 +48,18 @@ app.use('*', (req, res) => {
 // Inicializar servidor
 async function startServer() {
   try {
-    // Conectar a la base de datos
+    // Conectar a la base de datos PostgreSQL
     await database.connect();
     
     // Ejecutar migraciones automáticamente
-    const autoMigrate = await import('./database/auto-migrate.js');
-    await autoMigrate.default();
+    console.log('🔄 Ejecutando migración de base de datos...');
+    await createFreshPostgresTables();
     
     // Iniciar servidor
     app.listen(PORT, () => {
       console.log('🚀 Servidor iniciado');
       console.log(`📍 URL: http://localhost:${PORT}`);
-      console.log(`🏗️  Arquitectura: MVC`);
+      console.log(`🏗️  Arquitectura: MVC + PostgreSQL`);
       console.log(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
       console.log(`📊 API: http://localhost:${PORT}/api`);
     });

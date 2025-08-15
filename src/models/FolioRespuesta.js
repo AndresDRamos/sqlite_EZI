@@ -1,5 +1,5 @@
 // src/models/FolioRespuesta.js - Modelo de Folio_respuestas (ES Modules)
-import database from '../../config/database-auto.js';
+import database from '../../config/database.js';
 
 class FolioRespuesta {
   constructor(data = {}) {

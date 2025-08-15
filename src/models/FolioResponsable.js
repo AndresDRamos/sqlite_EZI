@@ -1,5 +1,5 @@
 // src/models/FolioResponsable.js - Modelo de Folio_responsables (ES Modules)
-import database from '../../config/database-auto.js';
+import database from '../../config/database.js';
 
 class FolioResponsable {
   constructor(data = {}) {

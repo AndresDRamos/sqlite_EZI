@@ -1,5 +1,5 @@
 // src/models/Usuario.js - Modelo de Usuario (ES Modules)
-import database from '../../config/database-auto.js';
+import database from '../../config/database.js';
 
 class Usuario {
   constructor(data = {}) {
