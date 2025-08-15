@@ -1,4 +1,4 @@
-// server.js - Punto de entrada principal con PostgreSQL (ES Modules)
+// server.js - Ventanilla CH API con PostgreSQL
 import express from 'express';
 import cors from 'cors';
 import { config } from 'dotenv';
@@ -7,7 +7,7 @@ import { config } from 'dotenv';
 import database from './config/database.js';
 import apiRoutes from './src/routes/index.js';
 import errorHandler from './src/middleware/errorHandler.js';
-import createPostgresTables from './database/migrate-postgres.js';
+import createTables from './database/migrate.js';
 
 config(); // Cargar variables de entorno
 
@@ -53,7 +53,7 @@ async function startServer() {
     
     // Ejecutar migraciones automáticamente
     console.log('🔄 Ejecutando migración de base de datos...');
-    await createPostgresTables();
+    await createTables();
     
     // Iniciar servidor
     app.listen(PORT, () => {
