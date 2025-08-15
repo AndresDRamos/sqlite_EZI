@@ -13,7 +13,8 @@ class Database {
 
   connect() {
     return new Promise((resolve, reject) => {
-      this.db = new sqlite3.verbose().Database(
+      const sqlite = sqlite3.verbose();
+      this.db = new sqlite.Database(
         join(__dirname, '../database/ventanilla.db'),
         (err) => {
           if (err) {
