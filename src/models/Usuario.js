@@ -18,7 +18,7 @@ class Usuario {
     try {
       const sql = `
         SELECT "idUsuario", "Nombre", "Usuario", "Correo", "idRol", "idPlanta", "FechaCreacion" 
-        FROM "Usuarios" 
+        FROM "Usuarios" LEFT JOIN "Roles" ON "Usuarios"."idRol" = "Roles"."idRol"
         ORDER BY "Nombre"
       `;
       const rows = await database.query(sql);
