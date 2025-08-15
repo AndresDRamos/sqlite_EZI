@@ -1,13 +1,35 @@
 // database/migrate-postgres.js - Migración para PostgreSQL
-import database from '../config/database-postgres.js';
+import pg from 'pg';
+
+const { Pool } = pg;
 
 async function createTablesPostgres() {
+  // Crear una conexión temporal solo para migraciones
+  const connectionString = process.env.DATABASE_URL || 
+                           process.env.POSTGRES_URL || 
+                           process.env.DATABASE_PRIVATE_URL ||
+                           process.env.DATABASE_PUBLIC_URL;
+
+  if (!connectionString) {
+    throw new Error('No se encontró URL de PostgreSQL para migración');
+  }
+
+  const pool = new Pool({
+    connectionString: connectionString,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+
   try {
-    await database.connect();
     console.log('🚀 Iniciando migración PostgreSQL...');
 
+    // Helper para ejecutar queries
+    const query = async (sql, params = []) => {
+      const result = await pool.query(sql, params);
+      return result;
+    };
+
     // Crear tabla Usuarios (adaptada para PostgreSQL)
-    await database.query(`
+    await query(`
       CREATE TABLE IF NOT EXISTS Usuarios (
         idUsuario SERIAL PRIMARY KEY,
         Nombre VARCHAR(255) NOT NULL,
@@ -22,7 +44,7 @@ async function createTablesPostgres() {
     console.log('✅ Tabla Usuarios creada');
 
     // Crear tabla Roles
-    await database.query(`
+    await query(`
       CREATE TABLE IF NOT EXISTS Roles (
         idRol SERIAL PRIMARY KEY,
         NombreRol VARCHAR(100) NOT NULL UNIQUE
@@ -31,7 +53,7 @@ async function createTablesPostgres() {
     console.log('✅ Tabla Roles creada');
 
     // Insertar roles por defecto
-    await database.query(`
+    await query(`
       INSERT INTO Roles (idRol, NombreRol) VALUES 
       (1, 'Administrador'),
       (2, 'Solucionador')
@@ -40,7 +62,7 @@ async function createTablesPostgres() {
     console.log('✅ Roles por defecto insertados');
 
     // Crear tabla Folios
-    await database.query(`
+    await query(`
       CREATE TABLE IF NOT EXISTS Folios (
         idFolio SERIAL PRIMARY KEY,
         FechaHora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -57,7 +79,7 @@ async function createTablesPostgres() {
     console.log('✅ Tabla Folios creada');
 
     // Crear tabla Folio_responsables
-    await database.query(`
+    await query(`
       CREATE TABLE IF NOT EXISTS Folio_responsables (
         id SERIAL PRIMARY KEY,
         idFolio INTEGER NOT NULL,
@@ -71,7 +93,7 @@ async function createTablesPostgres() {
     console.log('✅ Tabla Folio_responsables creada');
 
     // Crear tabla Folio_respuestas
-    await database.query(`
+    await query(`
       CREATE TABLE IF NOT EXISTS Folio_respuestas (
         idRespuesta SERIAL PRIMARY KEY,
         idFolio INTEGER NOT NULL,
@@ -95,7 +117,7 @@ async function createTablesPostgres() {
 
     for (const index of indices) {
       try {
-        await database.query(index);
+        await query(index);
       } catch (error) {
         // Los índices pueden ya existir, ignoramos errores
         console.log(`Info: ${error.message}`);
@@ -103,13 +125,28 @@ async function createTablesPostgres() {
     }
     console.log('✅ Índices procesados');
 
+    // Insertar usuario admin por defecto si no existe
+    const adminExists = await query(`
+      SELECT COUNT(*) as count FROM Usuarios WHERE Usuario = 'admin'
+    `);
+    
+    if (adminExists.rows[0].count == 0) {
+      await query(`
+        INSERT INTO Usuarios (Nombre, Usuario, Correo, Contraseña, idRol) 
+        VALUES ('Administrador', 'admin', 'admin@ventanilla.com', 'admin123', 1)
+      `);
+      console.log('✅ Usuario admin creado');
+    } else {
+      console.log('ℹ️  Usuario admin ya existe');
+    }
+
     console.log('\n🎉 Migración PostgreSQL completada!');
 
   } catch (error) {
     console.error('❌ Error en migración PostgreSQL:', error);
     throw error;
   } finally {
-    await database.close();
+    await pool.end();
   }
 }
 

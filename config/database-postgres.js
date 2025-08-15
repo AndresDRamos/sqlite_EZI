@@ -49,12 +49,20 @@ class PostgresDatabase {
       if (sql.trim().toLowerCase().startsWith('select')) {
         return result.rows;
       } else {
+        // Para INSERT, intentar obtener el ID insertado
+        let lastID = null;
+        if (sql.trim().toLowerCase().startsWith('insert') && result.rows.length > 0) {
+          // Si la query retorna el ID (RETURNING clause)
+          lastID = result.rows[0].id || result.rows[0].idUsuario || result.rows[0].idFolio || result.rows[0].idRol;
+        }
+        
         return {
-          lastID: result.rows.length > 0 ? result.rows[0].id : null,
+          lastID: lastID,
           changes: result.rowCount || 0
         };
       }
     } catch (error) {
+      console.error('Error en query PostgreSQL:', error.message);
       throw error;
     }
   }
