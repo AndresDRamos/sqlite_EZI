@@ -52,10 +52,10 @@ class UsuarioController {
   // POST /usuarios
   static async store(req, res) {
     try {
-      const { Nombre, Usuario, Correo, Contraseña, idRol, idPlanta } = req.body;
+      const { Nombre, Usuario: nombreUsuario, Correo, Contraseña, idRol, idPlanta } = req.body;
 
       // Validación básica
-      if (!Nombre || !Usuario || !Correo || !Contraseña) {
+      if (!Nombre || !nombreUsuario || !Correo || !Contraseña) {
         return res.status(400).json({
           success: false,
           error: 'Todos los campos son requeridos'
@@ -63,7 +63,7 @@ class UsuarioController {
       }
 
       const nuevoUsuario = new Usuario({
-        Nombre, Usuario, Correo, Contraseña, idRol, idPlanta
+        Nombre, Usuario: nombreUsuario, Correo, Contraseña, idRol, idPlanta
       });
 
       await nuevoUsuario.save();
@@ -95,7 +95,7 @@ class UsuarioController {
   static async update(req, res) {
     try {
       const { id } = req.params;
-      const { Nombre, Usuario, Correo, idRol, idPlanta } = req.body;
+      const { Nombre, Usuario: nombreUsuario, Correo, idRol, idPlanta } = req.body;
 
       const usuario = await Usuario.findById(id);
       if (!usuario) {
@@ -107,7 +107,7 @@ class UsuarioController {
 
       // Actualizar campos
       usuario.Nombre = Nombre || usuario.Nombre;
-      usuario.Usuario = Usuario || usuario.Usuario;
+      usuario.Usuario = nombreUsuario || usuario.Usuario;
       usuario.Correo = Correo || usuario.Correo;
       usuario.idRol = idRol !== undefined ? idRol : usuario.idRol;
       usuario.idPlanta = idPlanta !== undefined ? idPlanta : usuario.idPlanta;
