@@ -1,5 +1,5 @@
-// src/models/Usuario.js - Modelo de Usuario
-const database = require('../../config/database');
+// src/models/Usuario.js - Modelo de Usuario (ES Modules)
+import database from '../../config/database.js';
 
 class Usuario {
   constructor(data = {}) {
@@ -18,7 +18,7 @@ class Usuario {
     try {
       const sql = `
         SELECT idUsuario, Nombre, Usuario, Correo, idRol, idPlanta, FechaCreacion 
-        FROM Usuarios 
+        FROM Users 
         ORDER BY Nombre
       `;
       const rows = await database.query(sql);
@@ -33,7 +33,7 @@ class Usuario {
     try {
       const sql = `
         SELECT idUsuario, Nombre, Usuario, Correo, idRol, idPlanta, FechaCreacion 
-        FROM Usuarios 
+        FROM Users 
         WHERE idUsuario = ?
       `;
       const rows = await database.query(sql, [id]);
@@ -47,7 +47,7 @@ class Usuario {
   static async findByUsername(username) {
     try {
       const sql = `
-        SELECT * FROM Usuarios 
+        SELECT * FROM Users 
         WHERE Usuario = ?
       `;
       const rows = await database.query(sql, [username]);
@@ -63,7 +63,7 @@ class Usuario {
       if (this.idUsuario) {
         // Actualizar usuario existente
         const sql = `
-          UPDATE Usuarios 
+          UPDATE Users 
           SET Nombre = ?, Usuario = ?, Correo = ?, idRol = ?, idPlanta = ? 
           WHERE idUsuario = ?
         `;
@@ -75,7 +75,7 @@ class Usuario {
       } else {
         // Crear nuevo usuario
         const sql = `
-          INSERT INTO Usuarios (Nombre, Usuario, Correo, Contraseña, idRol, idPlanta) 
+          INSERT INTO Users (Nombre, Usuario, Correo, Contraseña, idRol, idPlanta) 
           VALUES (?, ?, ?, ?, ?, ?)
         `;
         const result = await database.query(sql, [
@@ -93,7 +93,7 @@ class Usuario {
   // Eliminar usuario
   async delete() {
     try {
-      const sql = 'DELETE FROM Usuarios WHERE idUsuario = ?';
+      const sql = 'DELETE FROM Users WHERE idUsuario = ?';
       await database.query(sql, [this.idUsuario]);
       return true;
     } catch (error) {
@@ -124,4 +124,4 @@ class Usuario {
   }
 }
 
-module.exports = Usuario;
+export default Usuario;

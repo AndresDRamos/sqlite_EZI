@@ -1,6 +1,10 @@
-// config/database.js - Configuración de base de datos
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+// config/database.js - Configuración de base de datos (ES Modules)
+import sqlite3 from 'sqlite3';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 class Database {
   constructor() {
@@ -9,8 +13,8 @@ class Database {
 
   connect() {
     return new Promise((resolve, reject) => {
-      this.db = new sqlite3.Database(
-        path.join(__dirname, '../database/ventanilla.db'),
+      this.db = new sqlite3.verbose().Database(
+        join(__dirname, '../database/ventanilla.db'),
         (err) => {
           if (err) {
             console.error('Error conectando a la base de datos:', err);
@@ -55,4 +59,4 @@ class Database {
   }
 }
 
-module.exports = new Database();
+export default new Database();

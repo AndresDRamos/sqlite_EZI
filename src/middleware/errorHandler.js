@@ -1,4 +1,4 @@
-// src/middleware/errorHandler.js - Manejo global de errores
+// src/middleware/errorHandler.js - Manejo global de errores (ES Modules)
 const errorHandler = (err, req, res, next) => {
   console.error('Error capturado por middleware:', err);
 
@@ -28,4 +28,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

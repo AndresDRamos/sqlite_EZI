@@ -1,6 +1,6 @@
-// src/routes/index.js - Router principal
-const express = require('express');
-const usuariosRoutes = require('./usuarios');
+// src/routes/index.js - Router principal (ES Modules)
+import express from 'express';
+import usuariosRoutes from './usuarios.js';
 
 const router = express.Router();
 
@@ -26,4 +26,4 @@ router.get('/', (req, res) => {
 // Montar rutas
 router.use('/usuarios', usuariosRoutes);
 
-module.exports = router;
+export default router;

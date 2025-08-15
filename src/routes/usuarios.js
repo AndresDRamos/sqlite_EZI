@@ -1,6 +1,6 @@
-// src/routes/usuarios.js - Rutas de Usuarios
-const express = require('express');
-const UsuarioController = require('../controllers/usuarioController');
+// src/routes/usuarios.js - Rutas de Usuarios (ES Modules)
+import express from 'express';
+import UsuarioController from '../controllers/usuarioController.js';
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.post('/', UsuarioController.store);         // POST /api/usuarios
 router.put('/:id', UsuarioController.update);      // PUT /api/usuarios/:id
 router.delete('/:id', UsuarioController.destroy);  // DELETE /api/usuarios/:id
 
-module.exports = router;
+export default router;

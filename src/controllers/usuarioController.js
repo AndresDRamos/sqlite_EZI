@@ -1,5 +1,5 @@
-// src/controllers/usuarioController.js - Controlador de Usuarios
-const Usuario = require('../models/Usuario');
+// src/controllers/usuarioController.js - Controlador de Usuarios (ES Modules)
+import Usuario from '../models/Usuario.js';
 
 class UsuarioController {
   // GET /usuarios
@@ -159,4 +159,4 @@ class UsuarioController {
   }
 }
 
-module.exports = UsuarioController;
+export default UsuarioController;

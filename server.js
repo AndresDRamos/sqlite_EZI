@@ -1,12 +1,14 @@
-// server.js - Punto de entrada principal con arquitectura MVC
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+// server.js - Punto de entrada principal con arquitectura MVC (ES Modules)
+import express from 'express';
+import cors from 'cors';
+import { config } from 'dotenv';
 
 // Importaciones
-const database = require('./config/database');
-const apiRoutes = require('./src/routes/index');
-const errorHandler = require('./src/middleware/errorHandler');
+import database from './config/database.js';
+import apiRoutes from './src/routes/index.js';
+import errorHandler from './src/middleware/errorHandler.js';
+
+config(); // Cargar variables de entorno
 
 const app = express();
 const PORT = process.env.PORT || 3000;
