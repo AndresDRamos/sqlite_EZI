@@ -7,7 +7,7 @@ import { config } from 'dotenv';
 import database from './config/database.js';
 import apiRoutes from './src/routes/index.js';
 import errorHandler from './src/middleware/errorHandler.js';
-import createFreshPostgresTables from './database/migrate.js';
+import createPostgresTables from './database/migrate-postgres.js';
 
 config(); // Cargar variables de entorno
 
@@ -53,7 +53,7 @@ async function startServer() {
     
     // Ejecutar migraciones automáticamente
     console.log('🔄 Ejecutando migración de base de datos...');
-    await createFreshPostgresTables();
+    await createPostgresTables();
     
     // Iniciar servidor
     app.listen(PORT, () => {
