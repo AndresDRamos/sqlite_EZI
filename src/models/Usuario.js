@@ -1,5 +1,5 @@
 // src/models/Usuario.js - Modelo de Usuario (ES Modules)
-import database from '../../config/database.js';
+import database from "../../config/database.js";
 
 class Usuario {
   constructor(data = {}) {
@@ -17,12 +17,12 @@ class Usuario {
   static async findAll() {
     try {
       const sql = `
-        SELECT "idUsuario", "Nombre", "Usuario", "Correo", "idRol", "idPlanta", "FechaCreacion" 
+        SELECT "idUsuario", "Nombre", "Usuario", "Correo", "Roles"."Nombre" AS "Rol", "idPlanta", "FechaCreacion" 
         FROM "Usuarios" LEFT JOIN "Roles" ON "Usuarios"."idRol" = "Roles"."idRol"
         ORDER BY "Nombre"
       `;
       const rows = await database.query(sql);
-      return rows.map(row => new Usuario(row));
+      return rows.map((row) => new Usuario(row));
     } catch (error) {
       throw new Error(`Error obteniendo usuarios: ${error.message}`);
     }
@@ -53,7 +53,9 @@ class Usuario {
       const rows = await database.query(sql, [username]);
       return rows.length > 0 ? new Usuario(rows[0]) : null;
     } catch (error) {
-      throw new Error(`Error obteniendo usuario por username: ${error.message}`);
+      throw new Error(
+        `Error obteniendo usuario por username: ${error.message}`
+      );
     }
   }
 
@@ -68,8 +70,12 @@ class Usuario {
           WHERE "idUsuario" = $6
         `;
         await database.query(sql, [
-          this.Nombre, this.Usuario, this.Correo, 
-          this.idRol, this.idPlanta, this.idUsuario
+          this.Nombre,
+          this.Usuario,
+          this.Correo,
+          this.idRol,
+          this.idPlanta,
+          this.idUsuario,
         ]);
         return this;
       } else {
@@ -80,8 +86,12 @@ class Usuario {
           RETURNING "idUsuario"
         `;
         const result = await database.query(sql, [
-          this.Nombre, this.Usuario, this.Correo, 
-          this.Contraseña, this.idRol, this.idPlanta
+          this.Nombre,
+          this.Usuario,
+          this.Correo,
+          this.Contraseña,
+          this.idRol,
+          this.idPlanta,
         ]);
         this.idUsuario = result[0].idUsuario;
         return this;
