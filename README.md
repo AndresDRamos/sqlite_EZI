@@ -1,22 +1,13 @@
-# Ventanilla CH - API Node.js
+# Ventanilla CH - API Simple con SQLite
 
-Sistema de gestión de usuarios con SQLite (desarrollo) y PostgreSQL (producción).
+API básica para gestión de usuarios usando Express y SQLite.
 
-## Instalación
+## 🚀 Instalación y Uso
 
 ```bash
+# Instalar dependencias
 npm install
-```
 
-## Configuración
-
-1. Copia `.env` y configura las variables según tu entorno
-2. Para desarrollo local, usa SQLite (configuración por defecto)
-3. Para producción, configura `DATABASE_URL` con PostgreSQL
-
-## Comandos
-
-```bash
 # Desarrollo
 npm run dev
 
@@ -24,28 +15,23 @@ npm run dev
 npm start
 ```
 
-## API Endpoints
+## 📋 Archivos del Proyecto
 
-### Usuarios
-- `GET /api/usuarios` - Obtener todos los usuarios
-- `GET /api/usuarios/:id` - Obtener usuario por ID
-- `POST /api/usuarios` - Crear nuevo usuario
-- `PUT /api/usuarios/:id` - Actualizar usuario
-- `DELETE /api/usuarios/:id` - Eliminar usuario
+- `app.js` - Aplicación principal
+- `ventanilla.db` - Base de datos SQLite
+- `ventanilla.sql` - Script SQL con estructura y datos
+- `package.json` - Dependencias
 
-## Despliegue
+## 🌐 API Endpoints
 
-### Railway
-1. Conecta tu repositorio GitHub
-2. Configura variables de entorno
-3. Railway detectará automáticamente Node.js
+- `GET /` - Información de la API
+- `GET /usuarios` - Ver todos los usuarios
+- `GET /usuarios/:id` - Ver usuario específico
+- `POST /usuarios` - Crear nuevo usuario
 
-### Render
-1. Conecta tu repositorio
-2. Configura como "Web Service"
-3. Comando de build: `npm install`
-4. Comando de start: `npm start`
+## 📦 Despliegue
 
-### Vercel (solo para APIs)
-1. `vercel --prod`
-2. Configura variables de entorno en el dashboard
+Sube tu código a cualquier servicio que soporte Node.js:
+- **Vercel**, **Netlify**, **Railway**, **Render**
+
+Solo necesitas configurar el comando de inicio: `npm start`
