@@ -1,14 +1,14 @@
 # Sistema Ventanilla CH - Backend
 
-Sistema de gestión de folios con arquitectura MVC y soporte para múltiples bases de datos.
+Sistema de gestión de folios con arquitectura MVC y PostgreSQL.
 
 ## 🚀 Características
 
 - ✅ **Arquitectura MVC** - Separación clara de responsabilidades
-- ✅ **Múltiples BD** - SQLite (desarrollo) y PostgreSQL (producción)
+- ✅ **PostgreSQL** - Base de datos robusta para producción
 - ✅ **API RESTful** - Endpoints completos para todas las funcionalidades
-- ✅ **Migraciones automáticas** - Las tablas se crean automáticamente
-- ✅ **Datos persistentes** - Los datos se mantienen entre despliegues
+- ✅ **Migraciones inteligentes** - Las tablas se crean/verifican automáticamente
+- ✅ **Datos persistentes** - Los datos se mantienen entre despliegues en Railway
 
 ## 📊 Base de Datos
 
