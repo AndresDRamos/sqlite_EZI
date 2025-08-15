@@ -31,33 +31,33 @@ async function createTablesPostgres() {
     // Crear tabla Usuarios (adaptada para PostgreSQL)
     await query(`
       CREATE TABLE IF NOT EXISTS Usuarios (
-        idUsuario SERIAL PRIMARY KEY,
-        Nombre VARCHAR(255) NOT NULL,
-        Usuario VARCHAR(100) NOT NULL UNIQUE,
-        Correo VARCHAR(255) NOT NULL UNIQUE,
-        Contraseña VARCHAR(255) NOT NULL,
-        idRol INTEGER,
-        idPlanta INTEGER,
-        FechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        "idUsuario" SERIAL PRIMARY KEY,
+        "Nombre" VARCHAR(255) NOT NULL,
+        "Usuario" VARCHAR(100) NOT NULL UNIQUE,
+        "Correo" VARCHAR(255) NOT NULL UNIQUE,
+        "Contraseña" VARCHAR(255) NOT NULL,
+        "idRol" INTEGER,
+        "idPlanta" INTEGER,
+        "FechaCreacion" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log('✅ Tabla Usuarios creada');
 
     // Crear tabla Roles
     await query(`
-      CREATE TABLE IF NOT EXISTS Roles (
-        idRol SERIAL PRIMARY KEY,
-        NombreRol VARCHAR(100) NOT NULL UNIQUE
+      CREATE TABLE IF NOT EXISTS "Roles" (
+        "idRol" SERIAL PRIMARY KEY,
+        "NombreRol" VARCHAR(100) NOT NULL UNIQUE
       )
     `);
     console.log('✅ Tabla Roles creada');
 
     // Insertar roles por defecto
     await query(`
-      INSERT INTO Roles (idRol, NombreRol) VALUES 
+      INSERT INTO "Roles" ("idRol", "NombreRol") VALUES 
       (1, 'Administrador'),
       (2, 'Solucionador')
-      ON CONFLICT (idRol) DO NOTHING
+      ON CONFLICT ("idRol") DO NOTHING
     `);
     console.log('✅ Roles por defecto insertados');
 
@@ -127,14 +127,14 @@ async function createTablesPostgres() {
 
     // Insertar usuario admin por defecto si no existe
     const adminExists = await query(`
-      SELECT COUNT(*) as count FROM Usuarios WHERE Usuario = 'admin'
-    `);
+      SELECT COUNT(*) as count FROM "Usuarios" WHERE "Usuario" = $1
+    `, ['admin']);
     
     if (adminExists.rows[0].count == 0) {
       await query(`
-        INSERT INTO Usuarios (Nombre, Usuario, Correo, Contraseña, idRol) 
-        VALUES ('Administrador', 'admin', 'admin@ventanilla.com', 'admin123', 1)
-      `);
+        INSERT INTO "Usuarios" ("Nombre", "Usuario", "Correo", "Contraseña", "idRol") 
+        VALUES ($1, $2, $3, $4, $5)
+      `, ['Administrador', 'admin', 'admin@ventanilla.com', 'admin123', 1]);
       console.log('✅ Usuario admin creado');
     } else {
       console.log('ℹ️  Usuario admin ya existe');

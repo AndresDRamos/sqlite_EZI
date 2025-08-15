@@ -43,15 +43,27 @@ class PostgresDatabase {
 
   async query(sql, params = []) {
     try {
-      const result = await this.pool.query(sql, params);
+      // Convertir sintaxis SQLite (?) a PostgreSQL ($1, $2, etc.)
+      let pgSql = sql;
+      if (params.length > 0) {
+        let paramIndex = 1;
+        pgSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+      }
+      
+      console.log('🔍 Ejecutando query:', pgSql.substring(0, 100) + '...');
+      console.log('📊 Parámetros:', params);
+      
+      const result = await this.pool.query(pgSql, params);
+      
+      console.log('✅ Resultado:', result.rowCount, 'filas afectadas');
       
       // Para compatibilidad con SQLite, ajustamos la respuesta
-      if (sql.trim().toLowerCase().startsWith('select')) {
+      if (pgSql.trim().toLowerCase().startsWith('select')) {
         return result.rows;
       } else {
         // Para INSERT, intentar obtener el ID insertado
         let lastID = null;
-        if (sql.trim().toLowerCase().startsWith('insert') && result.rows.length > 0) {
+        if (pgSql.trim().toLowerCase().startsWith('insert') && result.rows.length > 0) {
           // Si la query retorna el ID (RETURNING clause)
           lastID = result.rows[0].id || result.rows[0].idUsuario || result.rows[0].idFolio || result.rows[0].idRol;
         }
@@ -62,7 +74,9 @@ class PostgresDatabase {
         };
       }
     } catch (error) {
-      console.error('Error en query PostgreSQL:', error.message);
+      console.error('❌ Error en query PostgreSQL:', error.message);
+      console.error('❌ SQL:', sql);
+      console.error('❌ Parámetros:', params);
       throw error;
     }
   }
