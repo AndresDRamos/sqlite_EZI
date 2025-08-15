@@ -18,7 +18,7 @@ class Usuario {
     try {
       const sql = `
         SELECT idUsuario, Nombre, Usuario, Correo, idRol, idPlanta, FechaCreacion 
-        FROM Users 
+        FROM Usuarios 
         ORDER BY Nombre
       `;
       const rows = await database.query(sql);
@@ -33,7 +33,7 @@ class Usuario {
     try {
       const sql = `
         SELECT idUsuario, Nombre, Usuario, Correo, idRol, idPlanta, FechaCreacion 
-        FROM Users 
+        FROM Usuarios 
         WHERE idUsuario = ?
       `;
       const rows = await database.query(sql, [id]);
@@ -47,7 +47,7 @@ class Usuario {
   static async findByUsername(username) {
     try {
       const sql = `
-        SELECT * FROM Users 
+        SELECT * FROM Usuarios 
         WHERE Usuario = ?
       `;
       const rows = await database.query(sql, [username]);
@@ -63,7 +63,7 @@ class Usuario {
       if (this.idUsuario) {
         // Actualizar usuario existente
         const sql = `
-          UPDATE Users 
+          UPDATE Usuarios 
           SET Nombre = ?, Usuario = ?, Correo = ?, idRol = ?, idPlanta = ? 
           WHERE idUsuario = ?
         `;
@@ -75,7 +75,7 @@ class Usuario {
       } else {
         // Crear nuevo usuario
         const sql = `
-          INSERT INTO Users (Nombre, Usuario, Correo, Contraseña, idRol, idPlanta) 
+          INSERT INTO Usuarios (Nombre, Usuario, Correo, Contraseña, idRol, idPlanta) 
           VALUES (?, ?, ?, ?, ?, ?)
         `;
         const result = await database.query(sql, [
@@ -93,7 +93,7 @@ class Usuario {
   // Eliminar usuario
   async delete() {
     try {
-      const sql = 'DELETE FROM Users WHERE idUsuario = ?';
+      const sql = 'DELETE FROM Usuarios WHERE idUsuario = ?';
       await database.query(sql, [this.idUsuario]);
       return true;
     } catch (error) {
