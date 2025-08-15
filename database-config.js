@@ -6,7 +6,10 @@ const path = require('path');
 
 class Database {
   constructor() {
-    this.isProduction = process.env.NODE_ENV === 'production';
+    // Usar SQLite si no hay DATABASE_URL configurada o si DB_TYPE está configurado como sqlite
+    this.isProduction = process.env.NODE_ENV === 'production' && 
+                       process.env.DATABASE_URL && 
+                       process.env.DB_TYPE !== 'sqlite';
     this.connection = null;
   }
 
