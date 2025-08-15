@@ -1,5 +1,5 @@
 // src/models/Rol.js - Modelo de Rol (ES Modules)
-import database from '../../config/database.js';
+import database from '../../config/database-auto.js';
 
 class Rol {
   constructor(data = {}) {

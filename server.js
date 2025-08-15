@@ -4,7 +4,7 @@ import cors from 'cors';
 import { config } from 'dotenv';
 
 // Importaciones
-import database from './config/database.js';
+import database from './config/database-auto.js';
 import apiRoutes from './src/routes/index.js';
 import errorHandler from './src/middleware/errorHandler.js';
 
@@ -49,6 +49,10 @@ async function startServer() {
   try {
     // Conectar a la base de datos
     await database.connect();
+    
+    // Ejecutar migraciones automáticamente
+    const autoMigrate = await import('./database/auto-migrate.js');
+    await autoMigrate.default();
     
     // Iniciar servidor
     app.listen(PORT, () => {
