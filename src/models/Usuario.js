@@ -17,9 +17,9 @@ class Usuario {
   static async findAll() {
     try {
       const sql = `
-        SELECT idUsuario, Nombre, Usuario, Correo, idRol, idPlanta, FechaCreacion 
-        FROM Usuarios 
-        ORDER BY Nombre
+        SELECT "idUsuario", "Nombre", "Usuario", "Correo", "idRol", "idPlanta", "FechaCreacion" 
+        FROM "Usuarios" 
+        ORDER BY "Nombre"
       `;
       const rows = await database.query(sql);
       return rows.map(row => new Usuario(row));
@@ -32,9 +32,9 @@ class Usuario {
   static async findById(id) {
     try {
       const sql = `
-        SELECT idUsuario, Nombre, Usuario, Correo, idRol, idPlanta, FechaCreacion 
-        FROM Usuarios 
-        WHERE idUsuario = ?
+        SELECT "idUsuario", "Nombre", "Usuario", "Correo", "idRol", "idPlanta", "FechaCreacion" 
+        FROM "Usuarios" 
+        WHERE "idUsuario" = $1
       `;
       const rows = await database.query(sql, [id]);
       return rows.length > 0 ? new Usuario(rows[0]) : null;
@@ -47,8 +47,8 @@ class Usuario {
   static async findByUsername(username) {
     try {
       const sql = `
-        SELECT * FROM Usuarios 
-        WHERE Usuario = ?
+        SELECT * FROM "Usuarios" 
+        WHERE "Usuario" = $1
       `;
       const rows = await database.query(sql, [username]);
       return rows.length > 0 ? new Usuario(rows[0]) : null;
@@ -63,9 +63,9 @@ class Usuario {
       if (this.idUsuario) {
         // Actualizar usuario existente
         const sql = `
-          UPDATE Usuarios 
-          SET Nombre = ?, Usuario = ?, Correo = ?, idRol = ?, idPlanta = ? 
-          WHERE idUsuario = ?
+          UPDATE "Usuarios" 
+          SET "Nombre" = $1, "Usuario" = $2, "Correo" = $3, "idRol" = $4, "idPlanta" = $5
+          WHERE "idUsuario" = $6
         `;
         await database.query(sql, [
           this.Nombre, this.Usuario, this.Correo, 
@@ -75,14 +75,15 @@ class Usuario {
       } else {
         // Crear nuevo usuario
         const sql = `
-          INSERT INTO Usuarios (Nombre, Usuario, Correo, Contraseña, idRol, idPlanta) 
-          VALUES (?, ?, ?, ?, ?, ?)
+          INSERT INTO "Usuarios" ("Nombre", "Usuario", "Correo", "Contraseña", "idRol", "idPlanta") 
+          VALUES ($1, $2, $3, $4, $5, $6)
+          RETURNING "idUsuario"
         `;
         const result = await database.query(sql, [
           this.Nombre, this.Usuario, this.Correo, 
           this.Contraseña, this.idRol, this.idPlanta
         ]);
-        this.idUsuario = result.lastID;
+        this.idUsuario = result[0].idUsuario;
         return this;
       }
     } catch (error) {
@@ -93,7 +94,7 @@ class Usuario {
   // Eliminar usuario
   async delete() {
     try {
-      const sql = 'DELETE FROM Usuarios WHERE idUsuario = ?';
+      const sql = 'DELETE FROM "Usuarios" WHERE "idUsuario" = $1';
       await database.query(sql, [this.idUsuario]);
       return true;
     } catch (error) {

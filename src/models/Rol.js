@@ -11,9 +11,9 @@ class Rol {
   static async findAll() {
     try {
       const sql = `
-        SELECT idRol, NombreRol 
-        FROM Roles 
-        ORDER BY idRol
+        SELECT "idRol", "NombreRol" 
+        FROM "Roles" 
+        ORDER BY "idRol"
       `;
       const rows = await database.query(sql);
       return rows.map(row => new Rol(row));
@@ -26,9 +26,9 @@ class Rol {
   static async findById(id) {
     try {
       const sql = `
-        SELECT idRol, NombreRol 
-        FROM Roles 
-        WHERE idRol = ?
+        SELECT "idRol", "NombreRol" 
+        FROM "Roles" 
+        WHERE "idRol" = $1
       `;
       const rows = await database.query(sql, [id]);
       return rows.length > 0 ? new Rol(rows[0]) : null;
@@ -41,11 +41,12 @@ class Rol {
   async save() {
     try {
       const sql = `
-        INSERT INTO Roles (NombreRol) 
-        VALUES (?)
+        INSERT INTO "Roles" ("NombreRol") 
+        VALUES ($1)
+        RETURNING "idRol"
       `;
       const result = await database.query(sql, [this.NombreRol]);
-      this.idRol = result.lastID;
+      this.idRol = result[0].idRol;
       return this;
     } catch (error) {
       throw new Error(`Error creando rol: ${error.message}`);
@@ -56,9 +57,9 @@ class Rol {
   async update() {
     try {
       const sql = `
-        UPDATE Roles 
-        SET NombreRol = ?
-        WHERE idRol = ?
+        UPDATE "Roles" 
+        SET "NombreRol" = $1
+        WHERE "idRol" = $2
       `;
       await database.query(sql, [this.NombreRol, this.idRol]);
       return this;
@@ -70,7 +71,7 @@ class Rol {
   // Eliminar rol
   async delete() {
     try {
-      const sql = `DELETE FROM Roles WHERE idRol = ?`;
+      const sql = `DELETE FROM "Roles" WHERE "idRol" = $1`;
       await database.query(sql, [this.idRol]);
       return true;
     } catch (error) {
